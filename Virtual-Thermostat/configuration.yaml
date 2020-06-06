@@ -1,0 +1,48 @@
+climate:
+  - platform: dualmode_generic #this is my modified dualmode_generic entity, you could adjust it to use the original though
+    name: Office
+    initial_hvac_mode: "off"
+    heater: input_boolean.office_heat
+    cooler: input_boolean.office_cool
+    target_sensor: sensor.test_temperature #the new sensor to base our virtual thermostat on
+    target_temp_high: 77
+    target_temp_low: 66
+    max_temp: 95
+    min_temp: 45
+    
+#this is really just for data trtracking, to give an at-a-glace source to show what is currently drivng the main thermostat
+input_select: 
+  temperature_control_mode:
+    options:
+      - Main
+      - Office
+    initial: Main
+
+input_boolean:
+  office_heat:
+    name: Office Heater State  
+    initial: off
+
+  office_cool:
+    name: Office Air Conditioner State  
+    initial: off
+
+#these are used to store original settings of the main thermostat while the virtual one is active
+input_number:
+  previous_local_target_temp_low:
+    name: Previous Local Low Temperature
+    initial: 68
+    min: 0
+    max: 100
+    step: 1
+    mode: box
+    icon: mdi:gauge
+
+  previous_local_target_temp_high:
+    name: Previous Local High Temperature
+    initial: 75
+    min: 0
+    max: 100
+    step: 1
+    mode: box
+    icon: mdi:gauge
