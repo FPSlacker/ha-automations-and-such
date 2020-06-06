@@ -1,4 +1,4 @@
-#Virtual Thermostat
+# Virtual Thermostat
 
 This is a set of configurations and automations to trigger a normal thermostat based on a temperature sensor in another room
 
