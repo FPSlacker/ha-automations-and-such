@@ -1,0 +1,96 @@
+- alias: Office Heat On
+  initial_state: on
+  trigger:
+    platform: state
+    entity_id: input_boolean.office_heat
+    to: 'on'
+  action:
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.previous_local_target_temp_low
+        value: '{{ states.climate.thermostat.attributes.target_temp_low }}'
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.previous_local_target_temp_high
+        value: '{{ states.climate.thermostat.attributes.target_temp_high }}'
+    - service: climate.set_temperature
+      data_template:
+        entity_id: climate.thermostat
+        temperature: >
+            {{ float(states.climate.thermostat.attributes.current_temperature) + ((float(states.climate.office.attributes.current_temperature) - float(states.climate.thermostat.attributes.current_temperature)) | abs) }}
+        target_temp_low: >
+            {{ float(states.climate.thermostat.attributes.current_temperature) + ((float(states.climate.office.attributes.current_temperature) - float(states.climate.thermostat.attributes.current_temperature)) | abs) }}
+        target_temp_high: >
+            {{ states.climate.office.attributes.target_temp_high  }}
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.temperature_control_mode
+        option: 'Office'
+
+
+- alias: Office Cool On
+  initial_state: on
+  trigger:
+    platform: state
+    entity_id: input_boolean.office_cool
+    to: 'on'
+  action:
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.previous_local_target_temp_low
+        value: '{{ states.climate.thermostat.attributes.target_temp_low }}'
+    - service: input_number.set_value
+      data_template:
+        entity_id: input_number.previous_local_target_temp_high
+        value: '{{ states.climate.thermostat.attributes.target_temp_high }}'
+    - service: climate.set_temperature
+      data_template:
+        entity_id: climate.thermostat
+        temperature: >
+            {{ float(states.climate.thermostat.attributes.current_temperature) - ((float(states.climate.office.attributes.current_temperature) - float(states.climate.thermostat.attributes.current_temperature)) | abs) }}
+        target_temp_low: >
+            {{ states.climate.office.attributes.target_temp_low  }}
+        target_temp_high: >
+            {{ float(states.climate.thermostat.attributes.current_temperature) - ((float(states.climate.office.attributes.current_temperature) - float(states.climate.thermostat.attributes.current_temperature)) | abs) }}
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.temperature_control_mode
+        option: 'Office'
+
+
+- alias: Office Heat Off
+  initial_state: on
+  trigger:
+    platform: state
+    entity_id: input_boolean.office_heat
+    to: 'off'
+  action:
+    - service: climate.set_temperature
+      data_template:
+        entity_id: climate.thermostat
+        temperature: 75
+        target_temp_low: '{{ states.input_number.previous_local_target_temp_low.state }}'
+        target_temp_high: '{{ states.input_number.previous_local_target_temp_high.state }}'
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.temperature_control_mode
+        option: 'Main'
+
+
+- alias: Office Cool Off
+  initial_state: on
+  trigger:
+    platform: state
+    entity_id: input_boolean.office_cool
+    to: 'off'
+  action:
+    - service: climate.set_temperature
+      data_template:
+        entity_id: climate.thermostat
+        temperature: 75
+        target_temp_low: '{{ states.input_number.previous_local_target_temp_low.state }}'
+        target_temp_high: '{{ states.input_number.previous_local_target_temp_high.state }}'
+    - service: input_select.select_option
+      data_template:
+        entity_id: input_select.temperature_control_mode
+        option: 'Main'
